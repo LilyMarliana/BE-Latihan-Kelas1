@@ -16,10 +16,14 @@ $stmt->bind_param("ssss", $nim, $nama, $alamat, $no_telp);
 
 if ($stmt->execute()) {
 
+    // Ambil ID terakhir
+    $last_id = $stmt->insert_id;
+
     echo json_encode([
         "status"  => "success",
         "message" => "Data berhasil ditambahkan",
         "data"    => [
+            "id"     => $last_id,
             "nim"     => $nim,
             "nama"    => $nama,
             "alamat"  => $alamat,
