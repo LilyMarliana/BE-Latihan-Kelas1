@@ -1,73 +1,65 @@
 <?php
-// Koneksi ke database menggunakan file db.php
+// Koneksi database
 include '../db.php';
 
-// Menentukan bahwa respon akan dalam format JSON
+// Response JSON
 header('Content-Type: application/json');
 
-// Array untuk menyimpan data hasil query
+// Array penampung data
 $data = [];
 
-// Cek apakah ada parameter GET 'nim' atau 'id'
-// Jika ada, maka hanya ambil data spesifik berdasarkan parameter tersebut
-if (isset($_GET['nim']) || isset($_GET['id'])) {
+// Cek parameter GET
+if (isset($_GET['nama']) || isset($_GET['id'])) {
 
-    // Jika parameter 'nim' disediakan, cari berdasarkan nim
-    if (isset($_GET['nim'])) {
-        $nim = $_GET['nim'];
-        // Mempersiapkan statement SQL untuk mencari data berdasarkan nim
-        $stmt = $conn->prepare("SELECT * FROM tb_mahasiswa WHERE nim = ?");
-        $stmt->bind_param("s", $nim);  // "s" artinya string
+    // 🔍 Cari berdasarkan nama
+    if (isset($_GET['nama'])) {
+        $nama = $_GET['nama'];
+
+        $stmt = $conn->prepare("
+            SELECT * FROM pengguna_growwell 
+            WHERE nama = ?
+        ");
+        $stmt->bind_param("s", $nama);
+
     } else {
-        // Jika parameter 'id' disediakan, cari berdasarkan id
+        // 🔍 Cari berdasarkan ID
         $id = $_GET['id'];
-        // Mempersiapkan statement SQL untuk mencari data berdasarkan id
-        $stmt = $conn->prepare("SELECT * FROM tb_mahasiswa WHERE id = ?");
-        $stmt->bind_param("i", $id);  // "i" artinya integer
+
+        $stmt = $conn->prepare("
+            SELECT * FROM pengguna_growwell 
+            WHERE id = ?
+        ");
+        $stmt->bind_param("i", $id);
     }
 
-    // Eksekusi statement
+    // Eksekusi
     $stmt->execute();
-    // Ambil hasil query
     $result = $stmt->get_result();
 
-    // Loop melalui hasil dan tambahkan ke array data
+    // Ambil data
     while ($row = $result->fetch_assoc()) {
         $data[] = $row;
     }
 
-    // Tutup statement
     $stmt->close();
 
 } else {
-    // Jika tidak ada parameter GET, ambil semua data dari tabel
-    $sql = "SELECT * FROM tb_mahasiswa";
+
+    // 📋 Ambil semua data
+    $sql = "SELECT * FROM pengguna_growwell";
     $result = $conn->query($sql);
 
-    // Loop melalui semua hasil dan tambahkan ke array data
     while ($row = $result->fetch_assoc()) {
         $data[] = $row;
     }
 }
 
-// Kirimkan data dalam format JSON
+// Response
 echo json_encode([
     "status"  => "success",
     "message" => count($data) > 0 ? "Data ditemukan" : "Data kosong",
     "data"    => $data
 ]);
 
-// Tutup koneksi database
 $conn->close();
-
-/*
-PETUNJUK UNTUK MENYESUAIKAN DENGAN SCHEMA TABEL LAIN:
-
-Jika ingin menggunakan skema tabel yang berbeda, ubah bagian-bagian berikut:
-1. Nama tabel: Ganti 'tb_mahasiswa' dengan nama tabel Anda
-2. Nama kolom: Ganti 'nim', 'id' sesuai dengan kolom pencarian di tabel Anda
-3. Parameter GET: Sesuaikan dengan nama parameter yang ingin Anda gunakan untuk pencarian
-4. Tipe data parameter: Perhatikan tipe data saat menggunakan bind_param()
-   Misalnya: "ii" untuk dua integer, "ss" untuk dua string
-*/
 ?>

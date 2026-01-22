@@ -1,66 +1,58 @@
 <?php
-// Koneksi ke database menggunakan file db.php
+// Koneksi database
 include_once '../db.php';
 
-// Menentukan bahwa respon akan dalam format JSON
+// Response JSON
 header('Content-Type: application/json');
 
-// Mengambil data dari form POST
-$nim     = $_POST['nim'];      // Nomor Induk Mahasiswa
-$nama    = $_POST['nama'];     // Nama mahasiswa
-$alamat  = $_POST['alamat'];   // Alamat mahasiswa
-$no_telp = $_POST['no_telp'];  // Nomor telepon mahasiswa
+// Ambil data dari POST
+$nama              = $_POST['nama'];
+$kategori_pengguna = $_POST['kategori_pengguna'];
+$status_risiko     = $_POST['status_risiko'];
+$tahun_registrasi  = $_POST['tahun_registrasi'];
 
-// Mempersiapkan statement SQL untuk menyimpan data baru
-// Gunakan prepared statement untuk mencegah SQL injection
+// Prepared statement INSERT
 $stmt = $conn->prepare("
-    INSERT INTO tb_mahasiswa (nim, nama, alamat, no_telp)
+    INSERT INTO pengguna_growwell 
+    (nama, kategori_pengguna, status_risiko, tahun_registrasi)
     VALUES (?, ?, ?, ?)
 ");
 
-// Mengikat parameter ke statement SQL
-// "ssss" artinya: string, string, string, string
-$stmt->bind_param("ssss", $nim, $nama, $alamat, $no_telp);
+// s = string, i = integer
+$stmt->bind_param(
+    "sssi",
+    $nama,
+    $kategori_pengguna,
+    $status_risiko,
+    $tahun_registrasi
+);
 
-// Eksekusi statement
+// Eksekusi
 if ($stmt->execute()) {
-    // Jika eksekusi berhasil, ambil ID terakhir yang dimasukkan
+
     $last_id = $stmt->insert_id;
 
-    // Kirimkan respon sukses beserta data yang disimpan
     echo json_encode([
         "status"  => "success",
-        "message" => "Data berhasil ditambahkan",
-        "data"    => [
-            "id"      => $last_id,
-            "nim"     => $nim,
-            "nama"    => $nama,
-            "alamat"  => $alamat,
-            "no_telp" => $no_telp
+        "message" => "Data pengguna berhasil ditambahkan",
+        "data" => [
+            "id" => $last_id,
+            "nama" => $nama,
+            "kategori_pengguna" => $kategori_pengguna,
+            "status_risiko" => $status_risiko,
+            "tahun_registrasi" => $tahun_registrasi
         ]
     ]);
 
 } else {
-    // Jika eksekusi gagal, kirimkan pesan error
+
     echo json_encode([
         "status"  => "error",
         "message" => $stmt->error
     ]);
-
 }
 
-// Menutup statement dan koneksi database
+// Tutup koneksi
 $stmt->close();
 $conn->close();
-
-/*
-PETUNJUK UNTUK MENYESUAIKAN DENGAN SCHEMA TABEL LAIN:
-
-Jika ingin menggunakan skema tabel yang berbeda, ubah bagian-bagian berikut:
-1. Nama tabel: Ganti 'tb_mahasiswa' dengan nama tabel Anda
-2. Nama kolom: Ganti 'nim', 'nama', 'alamat', 'no_telp' sesuai dengan kolom di tabel Anda
-3. Parameter POST: Sesuaikan dengan nama field yang dikirim dari form Anda
-4. Tipe data parameter: Perhatikan tipe data saat menggunakan bind_param()
-   Misalnya: "iiis" untuk integer, integer, integer, string
-*/
 ?>
