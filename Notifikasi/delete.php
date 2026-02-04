@@ -6,22 +6,22 @@ include '../db.php';
 header('Content-Type: application/json');
 
 // Ambil ID dari POST
-$id = $_POST['id'];
+$notifID = $_POST['notifID'];
 
 // Prepared statement DELETE
 $stmt = $conn->prepare("
-    DELETE FROM pengguna_growwell
-    WHERE id = ?
+    DELETE FROM notifikasi
+    WHERE notifID = ?
 ");
 
 // i = integer
-$stmt->bind_param("i", $id);
+$stmt->bind_param("i", $notifID);
 
 // Eksekusi
 if ($stmt->execute()) {
     echo json_encode([
         "status"  => "success",
-        "message" => "Data pengguna berhasil dihapus"
+        "message" => "Data notifikasi berhasil dihapus"
     ]);
 } else {
     echo json_encode([
