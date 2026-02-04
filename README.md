@@ -618,6 +618,20 @@ Contoh Respons Error:
 4. Konfigurasi koneksi database di file `db.php`
 5. Akses endpoint sesuai kebutuhan
 
+## Instalasi
+
+1. Pastikan Anda memiliki server web dengan PHP dan MySQL
+2. Salin semua file ke direktori web server Anda
+3. Buat database MySQL dan import struktur tabel dari file `growwell_db.sql`
+4. Konfigurasi koneksi database di file `db.php`:
+   ```php
+   $servername = "localhost";
+   $username = "root";  // sesuaikan dengan username MySQL Anda
+   $password = "";      // sesuaikan dengan password MySQL Anda
+   $dbname = "growwell_db";
+   ```
+5. Akses endpoint sesuai kebutuhan
+
 ## Catatan
 
 - Semua endpoint mengembalikan respons dalam format JSON
@@ -627,3 +641,5 @@ Contoh Respons Error:
 - Pastikan untuk selalu mengecek status respons sebelum memproses data lebih lanjut
 - Setiap tabel memiliki folder terpisah yang berisi endpoint-endpoint CRUD
 - Beberapa tabel memiliki constraint foreign key yang harus dipenuhi sebelum membuat data
+- Beberapa kolom memiliki tipe data ENUM yang hanya menerima nilai-nilai tertentu
+- Tabel-tabel memiliki relasi antar tabel yang harus dipertahankan untuk menjaga integritas data
